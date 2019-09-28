@@ -2,18 +2,21 @@ import flask
 
 app = flask.Flask(__name__)
 
-@app.route('/car')
-def car():
-  car = {
-    'driver': 'Brian',
-    'passengers': ['Danny', 'Chelsea', 'Vishal']
-  }
-  return wrap_res(car)
+database = {
+  'cars': [
+    {'seats': 5, 'mpg': 40}
+  ]
+}
 
-def wrap_res(res):
-  res = flask.jsonify(res)
-  res.headers.add('Access-Control-Allow-Origin', '*')
-  return res
+@app.route('/cars', methods=['GET'])
+def get_cars():
+  return flask.jsonify(database['cars'])
+
+@app.route('/car', methods=['POST'])
+def post_car():
+  car = flask.request.get_json()
+  database['cars'].append(car)
+  return flask.jsonify(car)
 
 if __name__ == '__main__':
   app.run(debug=True)

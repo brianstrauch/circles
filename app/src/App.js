@@ -1,39 +1,49 @@
 import React from 'react';
 
+import { getCars, postCar } from './api';
+
 export default class App extends React.Component {
   constructor(props) {
     super(props);
 
     this.state = {
-      car: {
-        driver: '',
-        passengers: []
-      }
+      cars: []
     };
+
+    this.addCar = this.addCar.bind(this);
   }
 
   componentDidMount() {
-    get('http://localhost:5000/car').then(car => {
-      this.setState({car: car});
+    getCars().then(cars => {
+      this.setState({cars: cars});
+    });
+  }
+
+  addCar() {
+    let car = {seats: 10, mpg: 20};
+
+    postCar(car).then(car => {
+      this.setState({cars: [...this.state.cars, car]});
     });
   }
 
   render() {
-    let { car } = this.state;
+    let { cars } = this.state;
 
-    let passengers = car.passengers.map((passenger, idx) => {
-      return <li key={idx}>{passenger}</li>;
+    cars = cars.map((car, idx) => {
+      return (
+        <div key={idx}>
+          <p>Seats: {car.seats}</p>
+          <p>MPG: {car.mpg}</p>
+        </div>
+      );  
     });
 
     return (
       <div>
-        <p>{car.driver}</p>
-        <ul>{passengers}</ul>
+        <div>{cars}</div>
+        <button onClick={this.addCar}>Add Car</button>
       </div>
     );
   }
-}
-
-function get(url) {
-  return fetch(url).then(res => res.json());
 }
