@@ -1,0 +1,19 @@
+.people {
+  background: red;
+  float: left;
+  width: 50%;
+  height: 400px;
+  overflow-y: auto;
+}
+
+.map {
+  background: green;
+  float: right;
+  width: 50%;
+  height: 400px;
+}
+
+.cars {
+  background: blue;
+  height: 100%;
+}
