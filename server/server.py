@@ -2,13 +2,31 @@ import flask
 
 app = flask.Flask(__name__)
 
+# In-Memory SQL Database
 database = {
+  'people': [
+    {
+      'firstName': 'Brian',
+      'lastName': 'S',
+      'address': '610 E Stoughton St, Champaign, IL'
+    }
+  ],
   'cars': [
     {'seats': 5, 'mpg': 40}
   ]
 }
 
-@app.route('/cars', methods=['GET'])
+@app.route('/person', methods=['GET'])
+def get_people():
+  return flask.jsonify(database['people'])
+
+@app.route('/person', methods=['POST'])
+def post_person():
+  person = flask.request.get_json()
+  database['people'].append(person)
+  return flask.jsonify(person)
+
+@app.route('/car', methods=['GET'])
 def get_cars():
   return flask.jsonify(database['cars'])
 
