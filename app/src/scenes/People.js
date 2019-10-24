@@ -16,13 +16,15 @@ export default class People extends React.Component {
 
     this.state = {
       people: [],
+      showModal: false,
+
       isEditing: false,
-      showModal: false
+      idx: 0
     };
 
-    this.insertPerson = this.insertPerson.bind(this);
-    this.updatePerson = this.updatePerson.bind(this);
-    this.deletePerson = this.deletePerson.bind(this);
+    this.onAdd = this.onAdd.bind(this);
+    this.onEdit = this.onEdit.bind(this);
+    this.onDelete = this.onDelete.bind(this);
 
     this.toggleModal = this.toggleModal.bind(this);
     this.submitModal = this.submitModal.bind(this);
@@ -34,13 +36,13 @@ export default class People extends React.Component {
     });
   }
 
-  insertPerson() {
+  onAdd() {
     this.setState({isEditing: false});
     this.toggleModal();
   }
 
-  updatePerson(idx) {
-    this.setState({isEditing: true});
+  onEdit(idx) {
+    this.setState({isEditing: true, idx: idx});
     this.toggleModal();
   }
 
@@ -59,12 +61,21 @@ export default class People extends React.Component {
       lastName: event.target[1].value
     };
 
-    insertPerson(person).then(person => {
-      this.setState({people: [...this.state.people, person]});
-    });
+    if (this.state.isEditing) {
+      let { people, idx } = this.state;
+      person.id = people[idx].id;
+      updatePerson(person).then(person => {
+        people.splice(idx, 1, person);
+        this.setState({people: people});
+      });
+    } else {
+      insertPerson(person).then(person => {
+        this.setState({people: [...this.state.people, person]});
+      });
+    }
   }
 
-  deletePerson(idx) {
+  onDelete(idx) {
     let id = this.state.people[idx].id;
     deletePerson(id);
 
@@ -81,13 +92,21 @@ export default class People extends React.Component {
         <ListGroup.Item className="person" key={idx}>
           <input type="checkbox" />
           {fullName}
-          <Button variant="danger" onClick={() => this.deletePerson(idx)}>Delete</Button>
-          <Button variant="warning" onClick={() => this.updatePerson(idx)}>Edit</Button>
+          <Button variant="danger" onClick={() => this.onDelete(idx)}>Delete</Button>
+          <Button variant="warning" onClick={() => this.onEdit(idx)}>Edit</Button>
         </ListGroup.Item>
       );
     });
 
-    let command = this.state.isEditing ? 'Edit' : 'Add';
+    let command, person;
+    if (this.state.isEditing) {
+      command = 'Edit';
+      person = this.state.people[this.state.idx];
+    } else {
+      command = 'Add';
+      person = {firstName: '', lastName: ''};
+    }
+
     let modal = (
       <Modal show={this.state.showModal} onHide={this.toggleModal}>
         <Modal.Header closeButton>
@@ -98,12 +117,12 @@ export default class People extends React.Component {
           <Modal.Body>
             <Form.Group>
               <Form.Label>First Name</Form.Label>
-              <Form.Control placeholder="Brian" />
+              <Form.Control placeholder="Brian" defaultValue={person.firstName} />
             </Form.Group>
 
             <Form.Group>
               <Form.Label>Last Name</Form.Label>
-              <Form.Control placeholder="Strauch" />
+              <Form.Control placeholder="Strauch" defaultValue={person.lastName} />
             </Form.Group>
           </Modal.Body>
 
@@ -119,7 +138,7 @@ export default class People extends React.Component {
         <Card.Body>
           <Card.Title>
             People
-            <Button className="float-right" onClick={this.insertPerson}>Add</Button>
+            <Button className="float-right" onClick={this.onAdd}>Add</Button>
           </Card.Title>
           <ListGroup id="people-list">
             {people}
