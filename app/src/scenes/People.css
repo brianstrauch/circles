@@ -1,0 +1,12 @@
+#people-list {
+  margin-top: 32px;
+}
+
+.person input {
+  margin-right: 8px;
+}
+
+.person Button {
+  float: right;
+  margin-left: 4px;
+}
