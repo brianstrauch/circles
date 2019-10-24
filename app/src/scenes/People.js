@@ -6,7 +6,7 @@ import Form from 'react-bootstrap/Form';
 import ListGroup from 'react-bootstrap/ListGroup';
 import Modal from 'react-bootstrap/Modal';
 
-import { getPeople, addPerson } from '../api';
+import { getPeople, insertPerson, updatePerson, deletePerson } from '../api';
 
 import './People.css';
 
@@ -16,8 +16,13 @@ export default class People extends React.Component {
 
     this.state = {
       people: [],
+      isEditing: false,
       showModal: false
     };
+
+    this.insertPerson = this.insertPerson.bind(this);
+    this.updatePerson = this.updatePerson.bind(this);
+    this.deletePerson = this.deletePerson.bind(this);
 
     this.toggleModal = this.toggleModal.bind(this);
     this.submitModal = this.submitModal.bind(this);
@@ -27,6 +32,16 @@ export default class People extends React.Component {
     getPeople().then(people => {
       this.setState({people: people});
     });
+  }
+
+  insertPerson() {
+    this.setState({isEditing: false});
+    this.toggleModal();
+  }
+
+  updatePerson(idx) {
+    this.setState({isEditing: true});
+    this.toggleModal();
   }
 
   toggleModal() {
@@ -44,9 +59,18 @@ export default class People extends React.Component {
       lastName: event.target[1].value
     };
 
-    addPerson(person).then(person => {
+    insertPerson(person).then(person => {
       this.setState({people: [...this.state.people, person]});
     });
+  }
+
+  deletePerson(idx) {
+    let id = this.state.people[idx].id;
+    deletePerson(id);
+
+    let people = this.state.people;
+    people.splice(idx, 1);
+    this.setState({people: people});
   }
 
   render() {
@@ -57,16 +81,17 @@ export default class People extends React.Component {
         <ListGroup.Item className="person" key={idx}>
           <input type="checkbox" />
           {fullName}
-          <Button variant="danger">Delete</Button>
-          <Button variant="warning" onClick={this.toggleModal}>Edit</Button>
+          <Button variant="danger" onClick={() => this.deletePerson(idx)}>Delete</Button>
+          <Button variant="warning" onClick={() => this.updatePerson(idx)}>Edit</Button>
         </ListGroup.Item>
       );
     });
 
+    let command = this.state.isEditing ? 'Edit' : 'Add';
     let modal = (
       <Modal show={this.state.showModal} onHide={this.toggleModal}>
         <Modal.Header closeButton>
-          <Modal.Title>Add Person</Modal.Title>
+          <Modal.Title>{command} Person</Modal.Title>
         </Modal.Header>
 
         <Form onSubmit={this.submitModal}>
@@ -83,7 +108,7 @@ export default class People extends React.Component {
           </Modal.Body>
 
           <Modal.Footer>
-            <Button type="submit">Add</Button>
+            <Button type="submit">{command}</Button>
           </Modal.Footer>
         </Form>
       </Modal>
@@ -94,7 +119,7 @@ export default class People extends React.Component {
         <Card.Body>
           <Card.Title>
             People
-            <Button className="float-right" onClick={this.toggleModal}>Add</Button>
+            <Button className="float-right" onClick={this.insertPerson}>Add</Button>
           </Card.Title>
           <ListGroup id="people-list">
             {people}

@@ -4,34 +4,53 @@ app = flask.Flask(__name__)
 
 # In-Memory SQL Database
 database = {
-  'people': [
-    {
+  'cars': [],
+  'location': [],
+  'people': {
+    0: {
+      'id': 0,
       'firstName': 'Brian',
-      'lastName': 'S',
-      'address': '610 E Stoughton St, Champaign, IL'
+      'lastName': 'Strauch'
     }
-  ],
-  'cars': [
-    {'seats': 5, 'mpg': 40}
-  ]
+  },
+  'person_count': 1
 }
 
-@app.route('/person', methods=['GET'])
+@app.route('/people', methods=['GET'])
 def get_people():
-  return flask.jsonify(database['people'])
+  people = list(database['people'].values())
+  return flask.jsonify(people)
 
 @app.route('/person', methods=['POST'])
-def post_person():
+def insert_person():
+  id = database['person_count']
+  database['person_count'] += 1
+
   person = flask.request.get_json()
-  database['people'].append(person)
+  person['id'] = id
+  database['people'][id] = person
   return flask.jsonify(person)
+
+@app.route('/person', methods=['PUT'])
+def update_person():
+  person = flask.request.get_json()
+  id = person['id']
+  database['people'][id] = person
+  return flask.jsonify(person)
+
+@app.route('/person', methods=['DELETE'])
+def delete_person():
+  id = int(flask.request.args.get('id'))
+  person = database['people'][id]
+  del database['people'][id]
+  return person
 
 @app.route('/car', methods=['GET'])
 def get_cars():
   return flask.jsonify(database['cars'])
 
 @app.route('/car', methods=['POST'])
-def post_car():
+def add_car():
   car = flask.request.get_json()
   database['cars'].append(car)
   return flask.jsonify(car)
