@@ -2,7 +2,7 @@ export function getPeople() {
   return request('GET', '/person');
 }
 
-export function postPerson(person) {
+export function addPerson(person) {
   return request('POST', '/person', person);
 }
 
