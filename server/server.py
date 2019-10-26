@@ -1,49 +1,77 @@
 import flask
+import mysql.connector
 
 app = flask.Flask(__name__)
 
-# In-Memory SQL Database
-database = {
-  'cars': [],
-  'location': [],
-  'people': {
-    0: {
-      'id': 0,
-      'firstName': 'Brian',
-      'lastName': 'Strauch'
-    }
-  },
-  'person_count': 1
-}
+db = mysql.connector.connect(
+  user='root',
+  password='',
+  host='localhost',
+  database='circles'
+)
+
+PERSON_SCHEMA = (
+  'id',
+  'firstName',
+  'lastName',
+  'team',
+  'gender',
+  'locationId',
+  'carId'
+)
+
+def sql_to_json(schema, tuple):
+  return dict(zip(schema, tuple))
+
+def json_to_sql(obj):
+  keys = '(' + ', '.join(obj.keys()) + ')'
+  values = tuple(obj.values())
+  return keys, values
 
 @app.route('/people', methods=['GET'])
 def get_people():
-  people = list(database['people'].values())
+  people = db_get_people()
+  people = [sql_to_json(PERSON_SCHEMA, person) for person in people]
   return flask.jsonify(people)
+
+def db_get_people():
+  cursor = db.cursor()
+  cursor.execute('SELECT * FROM person')
+  return cursor.fetchall()
 
 @app.route('/person', methods=['POST'])
 def insert_person():
-  id = database['person_count']
-  database['person_count'] += 1
-
   person = flask.request.get_json()
-  person['id'] = id
-  database['people'][id] = person
+  person['id'] = db_insert_person(person)
   return flask.jsonify(person)
+
+def db_insert_person(person):
+  cursor = db.cursor()
+  keys, values = json_to_sql(person)
+  cursor.execute(f'INSERT INTO person {keys} VALUES {values}')
+  return cursor.lastrowid
 
 @app.route('/person', methods=['PUT'])
 def update_person():
   person = flask.request.get_json()
-  id = person['id']
-  database['people'][id] = person
+  db_update_person(person)
   return flask.jsonify(person)
+
+def db_update_person(person):
+  cursor = db.cursor()
+  updates = ', '.join(f'{key} = {repr(value)}' for key, value in person.items())
+  id = person['id']
+  cursor.execute(f'UPDATE person SET {updates} WHERE id = {id}')
 
 @app.route('/person', methods=['DELETE'])
 def delete_person():
   id = int(flask.request.args.get('id'))
-  person = database['people'][id]
-  del database['people'][id]
-  return person
+  db_delete_person(id)
+  return flask.jsonify({})
+
+def db_delete_person(id):
+  cursor = db.cursor()
+  cursor.execute(f'DELETE FROM person WHERE id = {id}')
 
 @app.route('/car', methods=['GET'])
 def get_cars():

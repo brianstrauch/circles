@@ -68,6 +68,7 @@ export default class People extends React.Component {
         people.splice(idx, 1, person);
         this.setState({people: people});
       });
+      this.setState({isEditing: false});
     } else {
       insertPerson(person).then(person => {
         this.setState({people: [...this.state.people, person]});
