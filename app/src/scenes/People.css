@@ -1,5 +1,7 @@
 #people-list {
   margin-top: 32px;
+  max-height: 300px;
+  overflow-y: scroll;
 }
 
 .person input {

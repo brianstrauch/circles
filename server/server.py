@@ -49,6 +49,7 @@ def db_insert_person(person):
   cursor = db.cursor()
   keys, values = json_to_sql(person)
   cursor.execute(f'INSERT INTO person {keys} VALUES {values}')
+  db.commit()
   return cursor.lastrowid
 
 @app.route('/person', methods=['PUT'])
@@ -62,6 +63,7 @@ def db_update_person(person):
   updates = ', '.join(f'{key} = {repr(value)}' for key, value in person.items())
   id = person['id']
   cursor.execute(f'UPDATE person SET {updates} WHERE id = {id}')
+  db.commit()
 
 @app.route('/person', methods=['DELETE'])
 def delete_person():
@@ -72,6 +74,7 @@ def delete_person():
 def db_delete_person(id):
   cursor = db.cursor()
   cursor.execute(f'DELETE FROM person WHERE id = {id}')
+  db.commit()
 
 @app.route('/car', methods=['GET'])
 def get_cars():
