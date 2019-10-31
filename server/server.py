@@ -88,8 +88,11 @@ def add_car():
 @app.route('/varsity', methods=['GET'])
 def get_varsityMembers():
   cursor = db.cursor()
-  cursor.execute("SELECT * FROM person WHERE team='Varsity'")
-  return cursor.fetchall()
+  team = 'Varsity'
+  cursor.execute("SELECT * FROM person WHERE team ='Varsity'")
+  people = cursor.fetchall()
+  people = [sql_to_json(PERSON_SCHEMA, person) for person in people]
+  return flask.jsonify(people)
 
 if __name__ == '__main__':
   app.run(debug=True)
