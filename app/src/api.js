@@ -2,6 +2,10 @@ export function getPeople() {
   return request('GET', '/people');
 }
 
+export function getVarsity() {
+  return request('GET', '/varsity');
+}
+
 export function insertPerson(person) {
   return request('POST', '/person', person);
 }

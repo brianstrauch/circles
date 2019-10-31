@@ -12,3 +12,11 @@
   float: right;
   margin-left: 4px;
 }
+
+#filters {
+  margin-top: 8px;
+}
+
+#filters input {
+  margin-right: 4px;
+}

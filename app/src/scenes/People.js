@@ -6,7 +6,7 @@ import Form from 'react-bootstrap/Form';
 import ListGroup from 'react-bootstrap/ListGroup';
 import Modal from 'react-bootstrap/Modal';
 
-import { getPeople, insertPerson, updatePerson, deletePerson } from '../api';
+import { getPeople, getVarsity, insertPerson, updatePerson, deletePerson } from '../api';
 
 import './People.css';
 
@@ -16,11 +16,16 @@ export default class People extends React.Component {
 
     this.state = {
       people: [],
-      showModal: false,
+      filters: {
+        varsity: false
+      },
 
+      showModal: false,
       isEditing: false,
       idx: 0
     };
+
+    this.toggleFilter = this.toggleFilter.bind(this);
 
     this.onAdd = this.onAdd.bind(this);
     this.onEdit = this.onEdit.bind(this);
@@ -34,6 +39,22 @@ export default class People extends React.Component {
     getPeople().then(people => {
       this.setState({people: people});
     });
+  }
+
+  toggleFilter() {
+    let isVarsity = !this.state.filters.varsity;
+
+    this.setState({filters: {varsity: isVarsity}});
+    
+    if (isVarsity) {
+      getVarsity().then(people => {
+        this.setState({people: people});
+      });
+    } else {
+      getPeople().then(people => {
+        this.setState({people: people});
+      });
+    }
   }
 
   onAdd() {
@@ -141,9 +162,15 @@ export default class People extends React.Component {
             People
             <Button className="float-right" onClick={this.onAdd}>Add</Button>
           </Card.Title>
+
           <ListGroup id="people-list">
             {people}
           </ListGroup>
+
+          <div id="filters">
+            <input type="checkbox" onClick={this.toggleFilter} />Varsity
+          </div>
+
           {modal}
         </Card.Body>
       </Card>

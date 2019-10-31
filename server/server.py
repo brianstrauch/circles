@@ -36,7 +36,18 @@ def get_people():
 
 def db_get_people():
   cursor = db.cursor()
-  cursor.execute('SELECT * FROM person')
+  cursor.execute('SELECT * FROM person ORDER BY firstName, lastName')
+  return cursor.fetchall()
+
+@app.route('/varsity', methods=['GET'])
+def get_varsity():
+  people = db_get_varsity()
+  people = [sql_to_json(PERSON_SCHEMA, person) for person in people]
+  return flask.jsonify(people)
+
+def db_get_varsity():
+  cursor = db.cursor()
+  cursor.execute("SELECT * FROM person WHERE team = 'Varsity' ORDER BY firstName, lastName")
   return cursor.fetchall()
 
 @app.route('/person', methods=['POST'])
@@ -75,24 +86,6 @@ def db_delete_person(id):
   cursor = db.cursor()
   cursor.execute(f'DELETE FROM person WHERE id = {id}')
   db.commit()
-
-@app.route('/car', methods=['GET'])
-def get_cars():
-  return flask.jsonify(database['cars'])
-
-@app.route('/car', methods=['POST'])
-def add_car():
-  car = flask.request.get_json()
-  database['cars'].append(car)
-  return flask.jsonify(car)
-@app.route('/varsity', methods=['GET'])
-def get_varsityMembers():
-  cursor = db.cursor()
-  team = 'Varsity'
-  cursor.execute("SELECT * FROM person WHERE team ='Varsity'")
-  people = cursor.fetchall()
-  people = [sql_to_json(PERSON_SCHEMA, person) for person in people]
-  return flask.jsonify(people)
 
 if __name__ == '__main__':
   app.run(debug=True)
