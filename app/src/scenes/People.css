@@ -1,5 +1,5 @@
 #people-list {
-  margin-top: 32px;
+  margin-top: 8px;
   max-height: 300px;
   overflow-y: scroll;
 }
@@ -14,9 +14,9 @@
 }
 
 #filters {
-  margin-top: 8px;
+  margin-top: 32px;
 }
 
 #filters input {
-  margin-right: 4px;
+  margin: 0 4px 0 4px;
 }

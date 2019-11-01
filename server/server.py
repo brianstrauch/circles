@@ -5,7 +5,6 @@ app = flask.Flask(__name__)
 
 db = mysql.connector.connect(
   user='root',
-  password='',
   host='localhost',
   database='circles'
 )
@@ -30,24 +29,33 @@ def json_to_sql(obj):
 
 @app.route('/people', methods=['GET'])
 def get_people():
-  people = db_get_people()
+  filters = flask.request.args
+  people = db_get_people(filters)
   people = [sql_to_json(PERSON_SCHEMA, person) for person in people]
   return flask.jsonify(people)
 
-def db_get_people():
+def db_get_people(filters):
   cursor = db.cursor()
-  cursor.execute('SELECT * FROM person ORDER BY firstName, lastName')
-  return cursor.fetchall()
 
-@app.route('/varsity', methods=['GET'])
-def get_varsity():
-  people = db_get_varsity()
-  people = [sql_to_json(PERSON_SCHEMA, person) for person in people]
-  return flask.jsonify(people)
+  query = 'SELECT * FROM person'
 
-def db_get_varsity():
-  cursor = db.cursor()
-  cursor.execute("SELECT * FROM person WHERE team = 'Varsity' ORDER BY firstName, lastName")
+  conditions = []
+  for key, vals in filters.items():
+    vals = vals.split(',') if len(vals) > 0 else []
+    if len(vals) == 0:
+      condition = f'{key} = NULL'
+    else:
+      condition = ' OR '.join([f'{key} = {repr(val)}' for val in vals])
+    condition = f'({condition})'
+    conditions.append(condition)
+
+  if len(conditions) > 0:
+    conditions = ' AND '.join(conditions)
+    query += f' WHERE {conditions}'
+
+  query += ' ORDER BY firstName, lastName'
+
+  cursor.execute(query)
   return cursor.fetchall()
 
 @app.route('/person', methods=['POST'])

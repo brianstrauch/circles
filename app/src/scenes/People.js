@@ -6,7 +6,7 @@ import Form from 'react-bootstrap/Form';
 import ListGroup from 'react-bootstrap/ListGroup';
 import Modal from 'react-bootstrap/Modal';
 
-import { getPeople, getVarsity, insertPerson, updatePerson, deletePerson } from '../api';
+import { getPeople, insertPerson, updatePerson, deletePerson } from '../api';
 
 import './People.css';
 
@@ -17,7 +17,8 @@ export default class People extends React.Component {
     this.state = {
       people: [],
       filters: {
-        varsity: false
+        team: ['Varsity', 'Novice'],
+        gender: ['M', 'F']
       },
 
       showModal: false,
@@ -36,25 +37,26 @@ export default class People extends React.Component {
   }
 
   componentDidMount() {
-    getPeople().then(people => {
+    getPeople(this.state.filters).then(people => {
       this.setState({people: people});
     });
   }
 
-  toggleFilter() {
-    let isVarsity = !this.state.filters.varsity;
+  toggleFilter(key, val) {
+    let { filters } = this.state;
 
-    this.setState({filters: {varsity: isVarsity}});
-    
-    if (isVarsity) {
-      getVarsity().then(people => {
-        this.setState({people: people});
-      });
+    var idx = filters[key].indexOf(val);
+    if (idx === -1) {
+      filters[key].push(val);
     } else {
-      getPeople().then(people => {
-        this.setState({people: people});
-      });
+      filters[key].splice(idx, 1);
     }
+
+    this.setState({ filters: filters });
+    
+    getPeople(this.state.filters).then(people => {
+      this.setState({people: people});
+    });
   }
 
   onAdd() {
@@ -163,13 +165,16 @@ export default class People extends React.Component {
             <Button className="float-right" onClick={this.onAdd}>Add</Button>
           </Card.Title>
 
+          <div id="filters">
+            <input type="checkbox" defaultChecked onChange={() => this.toggleFilter('team', 'Novice')} />Novice
+            <input type="checkbox" defaultChecked onChange={() => this.toggleFilter('team', 'Varsity')} />Varsity
+            <input type="checkbox" defaultChecked onChange={() => this.toggleFilter('gender', 'M')} />Men
+            <input type="checkbox" defaultChecked onChange={() => this.toggleFilter('gender', 'F')} />Women
+          </div>
+
           <ListGroup id="people-list">
             {people}
           </ListGroup>
-
-          <div id="filters">
-            <input type="checkbox" onClick={this.toggleFilter} />Varsity
-          </div>
 
           {modal}
         </Card.Body>

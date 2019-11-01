@@ -1,9 +1,12 @@
-export function getPeople() {
-  return request('GET', '/people');
-}
-
-export function getVarsity() {
-  return request('GET', '/varsity');
+export function getPeople(filters) {
+  let conditions = [];
+  for (var key in filters) {
+    let val = filters[key].join(',');
+    conditions.push(`${key}=${val}`);
+  }
+  let params = '?' + conditions.join('&');
+  console.log(params);
+  return request('GET', '/people' + params);
 }
 
 export function insertPerson(person) {
