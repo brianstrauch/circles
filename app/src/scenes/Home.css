@@ -1,8 +1,23 @@
+#home {
+  min-height: 100%;
+}
+
 .navbar {
   margin-bottom: 24px;
 }
 
 .card {
-  width: 400px;
   margin: 16px;
+}
+
+#people {
+  width: 400px;
+}
+
+#map {
+  width: 400px;
+}
+
+#cars {
+  width: 832px;
 }

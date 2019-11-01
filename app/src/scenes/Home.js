@@ -18,15 +18,17 @@ export default class Home extends React.Component {
 
         <Container>
           <Row>
-            <People />
-            <Card className="shadow-sm">
+            <People id="people" />
+            
+            <Card id="map" className="shadow-sm">
               <Card.Body>
                 <Card.Title>Map</Card.Title>
               </Card.Body>
             </Card>
           </Row>
+
           <Row>
-            <Card className="shadow-sm">
+            <Card id="cars" className="shadow-sm">
               <Card.Body>
                 <Card.Title>Cars</Card.Title>
               </Card.Body>

@@ -172,7 +172,7 @@ export default class People extends React.Component {
             <input type="checkbox" defaultChecked onChange={() => this.toggleFilter('gender', 'F')} />Women
           </div>
 
-          <ListGroup id="people-list">
+          <ListGroup id="people-list" className="list-group-flush border-bottom">
             {people}
           </ListGroup>
 
