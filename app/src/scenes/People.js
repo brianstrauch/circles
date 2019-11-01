@@ -62,11 +62,19 @@ export default class People extends React.Component {
   onAdd() {
     this.setState({isEditing: false});
     this.toggleModal();
+
+    getPeople(this.state.filters).then(people => {
+      this.setState({people: people});
+    });
   }
 
   onEdit(idx) {
     this.setState({isEditing: true, idx: idx});
     this.toggleModal();
+
+    getPeople(this.state.filters).then(people => {
+      this.setState({people: people});
+    });
   }
 
   toggleModal() {
@@ -81,20 +89,25 @@ export default class People extends React.Component {
 
     let person = {
       firstName: event.target[0].value,
-      lastName: event.target[1].value
+      lastName: event.target[1].value,
+      team: event.target[2].value,
+      gender: event.target[3].value
     };
 
     if (this.state.isEditing) {
       let { people, idx } = this.state;
       person.id = people[idx].id;
       updatePerson(person).then(person => {
-        people.splice(idx, 1, person);
-        this.setState({people: people});
+        getPeople(this.state.filters).then(people => {
+          this.setState({people: people});
+        });
       });
       this.setState({isEditing: false});
     } else {
       insertPerson(person).then(person => {
-        this.setState({people: [...this.state.people, person]});
+        getPeople(this.state.filters).then(people => {
+          this.setState({people: people});
+        });
       });
     }
   }
@@ -128,7 +141,7 @@ export default class People extends React.Component {
       person = this.state.people[this.state.idx];
     } else {
       command = 'Add';
-      person = {firstName: '', lastName: ''};
+      person = {firstName: '', lastName: '', team: '', gender: ''};
     }
 
     let modal = (
@@ -147,6 +160,16 @@ export default class People extends React.Component {
             <Form.Group>
               <Form.Label>Last Name</Form.Label>
               <Form.Control placeholder="Strauch" defaultValue={person.lastName} />
+            </Form.Group>
+
+            <Form.Group>
+              <Form.Label>Team</Form.Label>
+              <Form.Control placeholder="Varsity" defaultValue={person.team} />
+            </Form.Group>
+
+            <Form.Group>
+              <Form.Label>Gender</Form.Label>
+              <Form.Control placeholder="M" defaultValue={person.gender} />
             </Form.Group>
           </Modal.Body>
 

@@ -5,7 +5,6 @@ export function getPeople(filters) {
     conditions.push(`${key}=${val}`);
   }
   let params = '?' + conditions.join('&');
-  console.log(params);
   return request('GET', '/people' + params);
 }
 
