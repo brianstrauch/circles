@@ -16,17 +16,11 @@ export default class People extends React.Component {
 
     this.state = {
       people: [],
-      filters: {
-        team: ['Varsity', 'Novice'],
-        gender: ['M', 'F']
-      },
 
       showModal: false,
       isEditing: false,
       idx: 0
     };
-
-    this.toggleFilter = this.toggleFilter.bind(this);
 
     this.onAdd = this.onAdd.bind(this);
     this.onEdit = this.onEdit.bind(this);
@@ -37,23 +31,6 @@ export default class People extends React.Component {
   }
 
   componentDidMount() {
-    getPeople(this.state.filters).then(people => {
-      this.setState({people: people});
-    });
-  }
-
-  toggleFilter(key, val) {
-    let { filters } = this.state;
-
-    var idx = filters[key].indexOf(val);
-    if (idx === -1) {
-      filters[key].push(val);
-    } else {
-      filters[key].splice(idx, 1);
-    }
-
-    this.setState({ filters: filters });
-    
     getPeople(this.state.filters).then(people => {
       this.setState({people: people});
     });
@@ -183,17 +160,11 @@ export default class People extends React.Component {
     return (
       <Card id="people" className="shadow-sm">
         <Card.Body>
-          <Card.Title>
-            People
-            <Button className="float-right" onClick={this.onAdd}>Add</Button>
+          <Card.Title id="title">
+            <p>People</p>
+            <Button onClick={this.onAdd}>Add</Button>
+            <input id="search" className="form-control" placeholder="Search" />
           </Card.Title>
-
-          <div id="filters">
-            <input type="checkbox" defaultChecked onChange={() => this.toggleFilter('team', 'Novice')} />Novice
-            <input type="checkbox" defaultChecked onChange={() => this.toggleFilter('team', 'Varsity')} />Varsity
-            <input type="checkbox" defaultChecked onChange={() => this.toggleFilter('gender', 'M')} />Men
-            <input type="checkbox" defaultChecked onChange={() => this.toggleFilter('gender', 'F')} />Women
-          </div>
 
           <ListGroup id="people-list" className="list-group-flush border-bottom">
             {people}

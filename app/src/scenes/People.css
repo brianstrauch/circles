@@ -1,3 +1,17 @@
+#title p, #search, Button {
+  display: inline-block;
+}
+
+#title #search {
+  float: right;
+  width: 20%;
+}
+
+#title Button {
+  float: right;
+  margin-left: 4px;
+}
+
 #people-list {
   max-height: 300px;
   overflow-y: scroll;
@@ -10,12 +24,4 @@
 .person Button {
   float: right;
   margin-left: 4px;
-}
-
-#filters {
-  margin: 32px 0 8px 0;
-}
-
-#filters input {
-  margin: 0 4px 0 8px;
 }

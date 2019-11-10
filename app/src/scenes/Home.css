@@ -3,17 +3,13 @@
 }
 
 .navbar {
-  margin-bottom: 24px;
+  margin-bottom: 32px;
 }
 
 .card {
-  margin: 2%;
+  margin-bottom: 16px;
 }
 
-#cars, #people {
-  width: 46%;
-}
-
-#map, #assignments {
-  width: 96%;
+#people, #map, #assignments {
+  width: 100%;
 }

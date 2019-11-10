@@ -1,10 +1,13 @@
+export function getPeople() {
+  return request('GET', '/people');
+}
+
 export function getCars() {
   return request('GET', '/cars');
 }
 
-export function getPeople(filters) {
-  let params = new URLSearchParams(filters);
-  return request('GET', '/people?' + params);
+export function getPeopleAndCars() {
+  return request('GET', '/peopleandcars');
 }
 
 export function insertCar(car) {

@@ -6,7 +6,6 @@ import Navbar from 'react-bootstrap/Navbar';
 import Row from 'react-bootstrap/Row';
 
 import Assignments from './Assignments';
-import Cars from './Cars';
 import People from './People';
 
 import './Home.css';
@@ -22,7 +21,6 @@ export default class Home extends React.Component {
         <Container>
           <Row>
             <People />
-            <Cars />
           </Row>
 
           <Row>
