@@ -10,8 +10,8 @@ def get(table):
   query = f'SELECT * FROM {table}'
   return execute_read(query)
 
-def joined_get(table_a, key_a, table_b, key_b):
-  query = f'SELECT * FROM {table_a} a RIGHT JOIN {table_b} b ON a.{key_a} = b.{key_b}'
+def joined_filtered_get(table_a, key_a, table_b, key_b, search_key, search_val):
+  query = f'SELECT * FROM {table_a} a RIGHT JOIN {table_b} b ON a.{key_a} = b.{key_b} WHERE {search_key} LIKE \'%{search_val}%\''
   return execute_read(query)
 
 def insert(table, obj):
@@ -47,7 +47,8 @@ def execute_write(query):
   return id
 
 def json_to_sql(obj):
-  keys = '(' + ', '.join(obj.keys()) + ')'
+  keys = ', '.join(obj.keys())
+  keys = f'({keys})'
   vals = tuple(obj.values())
   return keys, vals
 

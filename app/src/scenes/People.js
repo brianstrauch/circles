@@ -23,6 +23,7 @@ export default class People extends React.Component {
     super(props);
 
     this.state = {
+      search: '',
       people: [],
 
       showPersonModal: false,
@@ -32,6 +33,7 @@ export default class People extends React.Component {
       isEditing: false
     };
 
+    this.onSearch = this.onSearch.bind(this);
     this.refresh = this.refresh.bind(this);
 
     this.submitPerson = this.submitPerson.bind(this);
@@ -43,6 +45,12 @@ export default class People extends React.Component {
 
   componentDidMount() {
     this.refresh();
+  }
+
+  onSearch(event) {
+    this.setState({search: event.target.value}, () => {
+      this.refresh();
+    });
   }
 
   submitPerson(event) {
@@ -107,7 +115,7 @@ export default class People extends React.Component {
   }
 
   refresh() {
-    getPeopleWithCars().then(people => {
+    getPeopleWithCars(this.state.search).then(people => {
       this.setState({people: people});
     });
   }
@@ -235,7 +243,7 @@ export default class People extends React.Component {
           <Card.Title id="title">
             <p>People</p>
             <Button onClick={() => this.setState({showPersonModal: true, isEditing: false})}>Add</Button>
-            <input id="search" className="form-control" placeholder="Search" />
+            <input id="search" className="form-control" placeholder="Search" onChange={this.onSearch} value={this.state.search} />
           </Card.Title>
 
           <ListGroup id="people-list" className="list-group">

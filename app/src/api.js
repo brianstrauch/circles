@@ -6,8 +6,8 @@ export function getCars() {
   return request('GET', '/cars');
 }
 
-export function getPeopleWithCars() {
-  return request('GET', '/peoplewithcars');
+export function getPeopleWithCars(search) {
+  return request('GET', `/peoplewithcars?search=${search}`);
 }
 
 export function insertCar(car) {

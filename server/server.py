@@ -36,13 +36,21 @@ CAR_AND_PERSON_SCHEMA = (
 
 @app.route('/peoplewithcars', methods=['GET'])
 def get_people_with_cars():
+  search = flask.request.args['search']
+
   people = []
-  cars_and_people = db.joined_get('car', 'id', 'person', 'carId')
+  cars_and_people = db.joined_filtered_get(
+    'car', 'id',
+    'person', 'carId',
+    'firstName', search
+  )
+
   for car_and_person in cars_and_people:
     car, person = car_and_person[:4], car_and_person[4:]
     person = sql_to_json(PERSON_SCHEMA, person)
     person['car'] = sql_to_json(CAR_SCHEMA, car)
     people.append(person)
+
   return flask.jsonify(people)
 
 @app.route('/people', methods=['GET'])
