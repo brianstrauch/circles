@@ -10,14 +10,10 @@
   margin: 16px;
 }
 
-#people {
+#cars, #people {
   width: 400px;
 }
 
-#map {
-  width: 400px;
-}
-
-#cars {
+#map, #assignments {
   width: 832px;
 }

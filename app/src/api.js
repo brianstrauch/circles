@@ -1,14 +1,30 @@
+export function getCars() {
+  return request('GET', '/cars');
+}
+
 export function getPeople(filters) {
   let params = new URLSearchParams(filters);
   return request('GET', '/people?' + params);
+}
+
+export function insertCar(car) {
+  return request('POST', '/car', car);
 }
 
 export function insertPerson(person) {
   return request('POST', '/person', person);
 }
 
+export function updateCar(car) {
+  return request('PUT', '/car', car);
+}
+
 export function updatePerson(person) {
   return request('PUT', '/person', person);
+}
+
+export function deleteCar(id) {
+  return request('DELETE', `/car?id=${id}`);
 }
 
 export function deletePerson(id) {
@@ -20,5 +36,7 @@ function request(method, endpoint, body) {
     headers: {'Content-Type': 'application/json'},
     method: method, 
     body: JSON.stringify(body)
-  }).then(res => res.json());
+  }).then(res => {
+    return res.json();
+  });
 }

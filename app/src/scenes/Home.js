@@ -6,6 +6,8 @@ import Navbar from 'react-bootstrap/Navbar';
 import Row from 'react-bootstrap/Row';
 
 import People from './People';
+import Cars from './Cars';
+
 import './Home.css';
 
 export default class Home extends React.Component {
@@ -18,9 +20,12 @@ export default class Home extends React.Component {
 
         <Container>
           <Row>
-            <People id="people" />
-            
-            <Card id="map" className="shadow-sm">
+            <People />
+            <Cars />
+          </Row>
+
+          <Row>
+            <Card id="map">
               <Card.Body>
                 <Card.Title>Map</Card.Title>
               </Card.Body>
@@ -28,9 +33,9 @@ export default class Home extends React.Component {
           </Row>
 
           <Row>
-            <Card id="cars" className="shadow-sm">
+            <Card id="assignments">
               <Card.Body>
-                <Card.Title>Cars</Card.Title>
+                <Card.Title>Assignments</Card.Title>
               </Card.Body>
             </Card>
           </Row>

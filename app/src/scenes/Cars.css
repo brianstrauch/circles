@@ -1,0 +1,14 @@
+#car-list {
+  margin-top: 32px;
+  max-height: 300px;
+  overflow-y: scroll;
+}
+
+.car input {
+  margin-right: 8px;
+}
+
+.car Button {
+  float: right;
+  margin-left: 4px;
+}
