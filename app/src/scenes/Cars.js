@@ -156,7 +156,7 @@ export default class Cars extends React.Component {
     );
 
     return (
-      <Card id="cars">
+      <Card id="cars" className="shadow-sm">
         <Card.Body>
           <Card.Title>
             Cars

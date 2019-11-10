@@ -7,13 +7,13 @@
 }
 
 .card {
-  margin: 16px;
+  margin: 2%;
 }
 
 #cars, #people {
-  width: 400px;
+  width: 46%;
 }
 
 #map, #assignments {
-  width: 832px;
+  width: 96%;
 }

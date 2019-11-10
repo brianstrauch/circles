@@ -5,8 +5,9 @@ import Container from 'react-bootstrap/Container';
 import Navbar from 'react-bootstrap/Navbar';
 import Row from 'react-bootstrap/Row';
 
-import People from './People';
+import Assignments from './Assignments';
 import Cars from './Cars';
+import People from './People';
 
 import './Home.css';
 
@@ -26,18 +27,14 @@ export default class Home extends React.Component {
 
           <Row>
             <Card id="map">
-              <Card.Body>
+              <Card.Body className="shadow-sm">
                 <Card.Title>Map</Card.Title>
               </Card.Body>
             </Card>
           </Row>
 
           <Row>
-            <Card id="assignments">
-              <Card.Body>
-                <Card.Title>Assignments</Card.Title>
-              </Card.Body>
-            </Card>
+            <Assignments />
           </Row>
         </Container>
       </div>
