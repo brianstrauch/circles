@@ -7,31 +7,29 @@ pool = mysql.connector.pooling.MySQLConnectionPool(
 )
 
 def get(table):
-  db = pool.get_connection()
-  cursor = db.cursor()
-  cursor.execute(f'SELECT * FROM {table}')
-  rows = cursor.fetchall()
-  db.close()
-  return rows
+  query = f'SELECT * FROM {table}'
+  return execute_read(query)
 
-def filtered_get(table, filters):
-  query = 'SELECT * FROM person'
-  conds = []
-  for key, vals in filters.items():
-    vals = vals.split(',') if len(vals) > 0 else []
-    if len(vals) == 0:
-      cond = f'{key} = NULL'
-    else:
-      cond = ' OR '.join([f'{key} = {repr(val)}' for val in vals])
-    cond = f'({cond})'
-    conds.append(cond)
+def joined_get(table_a, key_a, table_b, key_b):
+  query = f'SELECT * FROM {table_a} a RIGHT JOIN {table_b} b ON a.{key_a} = b.{key_b}'
+  return execute_read(query)
 
-  if len(conds) > 0:
-    conds = ' AND '.join(conds)
-    query += f' WHERE {conds}'
+def insert(table, obj):
+  keys, vals = json_to_sql(obj)
+  query = f'INSERT INTO {table} {keys} VALUES {vals}'
+  return execute_write(query)
 
-  query += ' ORDER BY firstName, lastName'
+def update(table, obj):
+  updates = ', '.join(f'{key} = {repr(val)}' for key, val in obj.items())
+  id = obj['id']
+  query = f'UPDATE {table} SET {updates} WHERE id = {id}'
+  return execute_write(query)
 
+def delete(table, id):
+  query = f'DELETE FROM {table} WHERE id = {id}'
+  return execute_write(query)
+
+def execute_read(query):
   db = pool.get_connection()
   cursor = db.cursor()
   cursor.execute(query)
@@ -39,32 +37,14 @@ def filtered_get(table, filters):
   db.close()
   return rows
 
-def insert(table, obj):
-  keys, vals = json_to_sql(obj)
+def execute_write(query):
   db = pool.get_connection()
   cursor = db.cursor()
-  cursor.execute(f'INSERT INTO {table} {keys} VALUES {vals}')
+  cursor.execute(query)
   db.commit()
   id = cursor.lastrowid
   db.close()
   return id
-
-def update(table, obj):
-  updates = ', '.join(f'{key} = {repr(val)}' for key, val in obj.items())
-  id = obj['id']
-
-  db = pool.get_connection()
-  cursor = db.cursor()
-  cursor.execute(f'UPDATE {table} SET {updates} WHERE id = {id}')
-  db.commit()
-  db.close()
-
-def delete(table, id):
-  db = pool.get_connection()
-  cursor = db.cursor()
-  cursor.execute(f'DELETE FROM {table} WHERE id = {id}')
-  db.commit()
-  db.close()
 
 def json_to_sql(obj):
   keys = '(' + ', '.join(obj.keys()) + ')'

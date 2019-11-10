@@ -6,7 +6,15 @@ import Form from 'react-bootstrap/Form';
 import ListGroup from 'react-bootstrap/ListGroup';
 import Modal from 'react-bootstrap/Modal';
 
-import { getPeople, insertPerson, updatePerson, deletePerson } from '../api';
+import {
+  deleteCar,
+  deletePerson,
+  getPeopleWithCars,
+  insertCar,
+  insertPerson,
+  updateCar,
+  updatePerson,
+} from '../api';
 
 import './People.css';
 
@@ -17,49 +25,28 @@ export default class People extends React.Component {
     this.state = {
       people: [],
 
-      showModal: false,
-      isEditing: false,
-      idx: 0
+      showPersonModal: false,
+      showCarModal: false,
+
+      person: {},
+      isEditing: false
     };
 
-    this.onAdd = this.onAdd.bind(this);
-    this.onEdit = this.onEdit.bind(this);
-    this.onDelete = this.onDelete.bind(this);
+    this.refresh = this.refresh.bind(this);
 
-    this.toggleModal = this.toggleModal.bind(this);
-    this.submitModal = this.submitModal.bind(this);
+    this.submitPerson = this.submitPerson.bind(this);
+    this.onDeletePerson = this.onDeletePerson.bind(this);
+
+    this.submitCar = this.submitCar.bind(this);
+    this.onDeleteCar = this.onDeleteCar.bind(this);
   }
 
   componentDidMount() {
-    getPeople(this.state.filters).then(people => {
-      this.setState({people: people});
-    });
+    this.refresh();
   }
 
-  onAdd() {
-    this.setState({isEditing: false});
-    this.toggleModal();
-
-    getPeople(this.state.filters).then(people => {
-      this.setState({people: people});
-    });
-  }
-
-  onEdit(idx) {
-    this.setState({isEditing: true, idx: idx});
-    this.toggleModal();
-
-    getPeople(this.state.filters).then(people => {
-      this.setState({people: people});
-    });
-  }
-
-  toggleModal() {
-    this.setState({showModal: !this.state.showModal});
-  }
-
-  submitModal(event) {
-    this.toggleModal();
+  submitPerson(event) {
+    this.setState({showPersonModal: false});
 
     event.persist();
     event.preventDefault();
@@ -72,62 +59,116 @@ export default class People extends React.Component {
     };
 
     if (this.state.isEditing) {
-      let { people, idx } = this.state;
-      person.id = people[idx].id;
+      person.id = this.state.person.id;
       updatePerson(person).then(person => {
-        getPeople(this.state.filters).then(people => {
-          this.setState({people: people});
-        });
+        this.refresh();
       });
-      this.setState({isEditing: false});
     } else {
       insertPerson(person).then(person => {
-        getPeople(this.state.filters).then(people => {
-          this.setState({people: people});
-        });
+        this.refresh();
       });
     }
   }
 
-  onDelete(idx) {
-    let id = this.state.people[idx].id;
-    deletePerson(id);
+  submitCar(event) {
+    this.setState({showCarModal: false});
 
-    let people = this.state.people;
-    people.splice(idx, 1);
-    this.setState({people: people});
+    event.persist();
+    event.preventDefault();
+
+    let car = {
+      model: event.target[0].value,
+      capacity: event.target[1].value,
+      mpg: event.target[2].value
+    };
+
+    if (this.state.isEditing) {
+      car.id = this.state.person.carId;
+      updateCar(car).then(car => {
+        this.refresh();
+      });
+    } else {
+      insertCar(car).then(car => {
+        this.refresh();
+      });
+    }
+  }
+
+  onDeletePerson(id) {
+    deletePerson(id).then(() => {
+      this.refresh();
+    });
+  }
+
+  onDeleteCar(id) {
+    deleteCar(id).then(() => {
+      this.refresh();
+    });
+  }
+
+  refresh() {
+    getPeopleWithCars().then(people => {
+      this.setState({people: people});
+    });
   }
 
   render() {
-    let { people } = this.state;
-    people = people.map((person, idx) => {
-      let fullName = person.firstName + ' ' + person.lastName;
-      return (
-        <ListGroup.Item className="person" key={idx}>
+    let peopleWithCars = this.state.people.map(person => {
+      let { car, id, firstName, lastName } = person;
+
+      let personRow = (
+        <div className="person">
           <input type="checkbox" />
-          {fullName}
-          <Button variant="danger" onClick={() => this.onDelete(idx)}>Delete</Button>
-          <Button variant="warning" onClick={() => this.onEdit(idx)}>Edit</Button>
+          {firstName} {lastName}
+          <Button
+            variant="danger"
+            onClick={() => this.onDeletePerson(id)}>Delete</Button>
+          <Button
+            variant="warning"
+            onClick={() => this.setState({showPersonModal: true, isEditing: true, person: person})}>Edit</Button>
+        </div>
+      );
+
+      let carRow = (
+        <div className="car">
+          {car.model ? car.model : "Unknown model"}
+          <Button
+            variant="danger"
+            onClick={() => this.onDeleteCar(id)}
+          >Delete</Button>
+          <Button
+            variant="warning"
+            onClick={() => this.setState({showCarModal: true, isEditing: true, person: person})}
+          >Edit</Button>
+        </div>
+      );
+
+      return (
+        <ListGroup.Item key={id}>
+          {personRow}
+          {car.id && carRow}
         </ListGroup.Item>
       );
     });
 
-    let command, person;
+    let command, person, car;
     if (this.state.isEditing) {
       command = 'Edit';
-      person = this.state.people[this.state.idx];
+      person = this.state.person;
+      car = this.state.person.car;
     } else {
       command = 'Add';
       person = {firstName: '', lastName: '', team: '', gender: ''};
+      car = {model: '', capacity: '', mpg: ''};
     }
 
-    let modal = (
-      <Modal show={this.state.showModal} onHide={this.toggleModal}>
+    let personModal = (
+      <Modal show={this.state.showPersonModal} onHide={() => this.setState({showPersonModal: false})}>
         <Modal.Header closeButton>
           <Modal.Title>{command} Person</Modal.Title>
         </Modal.Header>
 
-        <Form onSubmit={this.submitModal}>
+        <Form onSubmit={this.submitPerson}>
           <Modal.Body>
             <Form.Group>
               <Form.Label>First Name</Form.Label>
@@ -157,20 +198,52 @@ export default class People extends React.Component {
       </Modal>
     );
 
+    let carModal = (
+      <Modal show={this.state.showCarModal} onHide={() => this.setState({showCarModal: false})}>
+        <Modal.Header closeButton>
+          <Modal.Title>{command} Car</Modal.Title>
+        </Modal.Header>
+
+        <Form onSubmit={this.submitCar}>
+          <Modal.Body>
+            <Form.Group>
+              <Form.Label>Model</Form.Label>
+              <Form.Control placeholder="Tesla" defaultValue={car.model} />
+            </Form.Group>
+
+            <Form.Group>
+              <Form.Label>Capacity</Form.Label>
+              <Form.Control placeholder="5" defaultValue={car.capacity} />
+            </Form.Group>
+
+            <Form.Group>
+              <Form.Label>MPG</Form.Label>
+              <Form.Control placeholder="Infinity" defaultValue={car.mpg} />
+            </Form.Group>
+          </Modal.Body>
+
+          <Modal.Footer>
+            <Button type="submit">{command}</Button>
+          </Modal.Footer>
+        </Form>
+      </Modal>
+    );
+
     return (
       <Card id="people" className="shadow-sm">
         <Card.Body>
           <Card.Title id="title">
             <p>People</p>
-            <Button onClick={this.onAdd}>Add</Button>
+            <Button onClick={() => this.setState({showPersonModal: true, isEditing: false})}>Add</Button>
             <input id="search" className="form-control" placeholder="Search" />
           </Card.Title>
 
-          <ListGroup id="people-list" className="list-group-flush border-bottom">
-            {people}
+          <ListGroup id="people-list" className="list-group">
+            {peopleWithCars}
           </ListGroup>
 
-          {modal}
+          {personModal}
+          {carModal}
         </Card.Body>
       </Card>
     );

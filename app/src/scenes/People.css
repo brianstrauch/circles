@@ -1,4 +1,4 @@
-#title p, #search, Button {
+#title p {
   display: inline-block;
 }
 
@@ -17,11 +17,20 @@
   overflow-y: scroll;
 }
 
+.person {
+  margin-right: 20%;
+}
+
+.person, .car {
+  display: inline-block;
+  width: 40%;
+}
+
 .person input {
   margin-right: 8px;
 }
 
-.person Button {
+.person Button, .car Button {
   float: right;
   margin-left: 4px;
 }

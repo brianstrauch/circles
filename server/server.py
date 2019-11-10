@@ -13,31 +13,6 @@ PERSON_SCHEMA = (
   'carId'
 )
 
-@app.route('/people', methods=['GET'])
-def get_people():
-  filters = flask.request.args
-  people = db.filtered_get('people', filters)
-  people = [sql_to_json(PERSON_SCHEMA, person) for person in people]
-  return flask.jsonify(people)
-
-@app.route('/person', methods=['POST'])
-def insert_person():
-  person = flask.request.get_json()
-  person['id'] = db.insert('person', person)
-  return flask.jsonify(person)
-
-@app.route('/person', methods=['PUT'])
-def update_person():
-  person = flask.request.get_json()
-  db.update('person', person)
-  return flask.jsonify(person)
-
-@app.route('/person', methods=['DELETE'])
-def delete_person():
-  id = int(flask.request.args.get('id'))
-  db.delete('person', id)
-  return flask.jsonify({})
-
 CAR_SCHEMA = (
   'id',
   'model',
@@ -45,11 +20,78 @@ CAR_SCHEMA = (
   'mpg'
 )
 
+CAR_AND_PERSON_SCHEMA = (
+  'id',
+  'model',
+  'capacity',
+  'mpg',
+
+  'id',
+  'firstName',
+  'lastName',
+  'team',
+  'gender',
+  'locationId'
+)
+
+@app.route('/peoplewithcars', methods=['GET'])
+def get_people_with_cars():
+  people = []
+  cars_and_people = db.joined_get('car', 'id', 'person', 'carId')
+  for car_and_person in cars_and_people:
+    car, person = car_and_person[:4], car_and_person[4:]
+    person = sql_to_json(PERSON_SCHEMA, person)
+    person['car'] = sql_to_json(CAR_SCHEMA, car)
+    people.append(person)
+  return flask.jsonify(people)
+
+@app.route('/people', methods=['GET'])
+def get_people():
+  people = db.get('people')
+  people = [sql_to_json(PERSON_SCHEMA, person) for person in people]
+  return flask.jsonify(people)
+
 @app.route('/cars', methods=['GET'])
 def get_cars():
   cars = db.get('car')
   cars = [sql_to_json(CAR_SCHEMA, car) for car in cars]
   return flask.jsonify(cars)
+
+@app.route('/person', methods=['POST'])
+def insert_person():
+  person = flask.request.get_json()
+  person['id'] = db.insert('person', person)
+  return flask.jsonify(person)
+
+@app.route('/car', methods=['POST'])
+def insert_car():
+  car = flask.request.get_json()
+  car['id'] = db.insert('car', car)
+  return flask.jsonify(car)
+  
+@app.route('/person', methods=['PUT'])
+def update_person():
+  person = flask.request.get_json()
+  db.update('person', person)
+  return flask.jsonify(person)
+
+@app.route('/car', methods=['PUT'])
+def update_car():
+  car = flask.request.get_json()
+  db.update('car', car)
+  return flask.jsonify(car)
+
+@app.route('/person', methods=['DELETE'])
+def delete_person():
+  id = int(flask.request.args.get('id'))
+  db.delete('person', id)
+  return flask.jsonify({})
+
+@app.route('/car', methods=['DELETE'])
+def delete_car():
+  id = int(flask.request.args.get('id'))
+  db.delete('car', id)
+  return flask.jsonify({})
 
 def sql_to_json(schema, tuple):
   return dict(zip(schema, tuple))
