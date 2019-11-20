@@ -1,5 +1,9 @@
 import React from 'react';
-import { Map, GoogleApiWrapper } from 'google-maps-react';
+import {
+  StaticGoogleMap,
+  Marker,
+  //Path,
+} from 'react-static-google-map';
 
 const mapStyles = {
   width: '100%',
@@ -7,22 +11,16 @@ const mapStyles = {
 };
 
 
-class MapContainer extends React.Component {
+export default class GoogleMap extends React.Component {
 
 
   render() {
+    console.log(process.env.REACT_APP_KEY);
     return(
-      <Map
-            google={this.props.google}
-            zoom={8}
-            style={mapStyles}
-            initialCenter={{ lat: 47.444, lng: -122.176}}
-          />
+      <StaticGoogleMap size="600x600" className="img-fluid" apiKey={process.env.REACT_APP_KEY}>
+        <Marker location="6.4488387,3.5496361" color="blue" label="P" />
+      </StaticGoogleMap>
     );
 
   }
 }
-
-export default GoogleApiWrapper({
-  apiKey: 'AIzaSyBW55K4x0WemR2LZDZfWKhb2nVBNu3lH8g'
-})(MapContainer);
