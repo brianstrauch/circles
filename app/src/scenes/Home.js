@@ -5,6 +5,7 @@ import Container from 'react-bootstrap/Container';
 import Navbar from 'react-bootstrap/Navbar';
 import Row from 'react-bootstrap/Row';
 
+import GoogleApiWrapper from './GoogleMap';
 import People from './People';
 import './Home.css';
 
@@ -22,6 +23,7 @@ export default class Home extends React.Component {
             <Card className="shadow-sm">
               <Card.Body>
                 <Card.Title>Map</Card.Title>
+                <GoogleApiWrapper />
               </Card.Body>
             </Card>
           </Row>
