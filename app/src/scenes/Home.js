@@ -6,7 +6,9 @@ import Navbar from 'react-bootstrap/Navbar';
 import Row from 'react-bootstrap/Row';
 
 import GoogleApiWrapper from './GoogleMap';
+import Assignments from './Assignments';
 import People from './People';
+
 import './Home.css';
 
 export default class Home extends React.Component {
@@ -20,19 +22,19 @@ export default class Home extends React.Component {
         <Container>
           <Row>
             <People />
-            <Card className="shadow-sm">
-              <Card.Body>
+          </Row>
+
+          <Row>
+            <Card id="map">
+              <Card.Body className="shadow-sm">
                 <Card.Title>Map</Card.Title>
                 <GoogleApiWrapper />
               </Card.Body>
             </Card>
           </Row>
+
           <Row>
-            <Card className="shadow-sm">
-              <Card.Body>
-                <Card.Title>Cars</Card.Title>
-              </Card.Body>
-            </Card>
+            <Assignments />
           </Row>
         </Container>
       </div>

@@ -1,12 +1,36 @@
+#title p {
+  display: inline-block;
+}
+
+#title #search {
+  float: right;
+  width: 20%;
+}
+
+#title Button {
+  float: right;
+  margin-left: 4px;
+}
+
 #people-list {
-  margin-top: 32px;
+  max-height: 300px;
+  overflow-y: scroll;
+}
+
+.person {
+  margin-right: 20%;
+}
+
+.person, .car {
+  display: inline-block;
+  width: 40%;
 }
 
 .person input {
   margin-right: 8px;
 }
 
-.person Button {
+.person Button, .car Button {
   float: right;
   margin-left: 4px;
 }
