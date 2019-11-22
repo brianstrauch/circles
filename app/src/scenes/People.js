@@ -26,6 +26,9 @@ export default class People extends React.Component {
       search: '',
       people: [],
 
+      onSelect: props.onSelect,
+      selectedPeople: [],
+
       showPersonModal: false,
       showCarModal: false,
 
@@ -122,39 +125,28 @@ export default class People extends React.Component {
 
   render() {
     let peopleWithCars = this.state.people.map(person => {
-      let { car, id, firstName, lastName } = person;
+      let { car, carId, id, firstName, lastName } = person;
 
-      let personRow = (
+      person = (
         <div className="person">
-          <input type="checkbox" />
-          {firstName} {lastName}
           <Button
-            variant="danger"
-            onClick={() => this.onDeletePerson(id)}>Delete</Button>
+            className="left-button"
+            onClick={() => this.state.onSelect(person)}>Add</Button>
+          {firstName} {lastName} {carId && '🚗'}
           <Button
+            className="right-button"
             variant="warning"
             onClick={() => this.setState({showPersonModal: true, isEditing: true, person: person})}>Edit</Button>
-        </div>
-      );
-
-      let carRow = (
-        <div className="car">
-          {car.model ? car.model : "Unknown model"}
           <Button
+            className="right-button"
             variant="danger"
-            onClick={() => this.onDeleteCar(id)}
-          >Delete</Button>
-          <Button
-            variant="warning"
-            onClick={() => this.setState({showCarModal: true, isEditing: true, person: person})}
-          >Edit</Button>
+            onClick={() => this.onDeletePerson(id)}>Delete</Button>
         </div>
       );
 
       return (
         <ListGroup.Item key={id}>
-          {personRow}
-          {car.id && carRow}
+          {person}
         </ListGroup.Item>
       );
     });
@@ -242,7 +234,7 @@ export default class People extends React.Component {
         <Card.Body>
           <Card.Title id="title">
             <p>People</p>
-            <Button onClick={() => this.setState({showPersonModal: true, isEditing: false})}>Add</Button>
+            <Button onClick={() => this.setState({showPersonModal: true, isEditing: false})}>New</Button>
             <input id="search" className="form-control" placeholder="Search" onChange={this.onSearch} value={this.state.search} />
           </Card.Title>
 

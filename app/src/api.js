@@ -34,6 +34,18 @@ export function deletePerson(id) {
   return request('DELETE', `/person?id=${id}`);
 }
 
+export function start_generate() {
+  return request('POST', '/generate/start');
+}
+
+export function get_assignments() {
+  return request('GET', '/generate/assignments');
+}
+
+export function stop_generate() {
+  return request('POST', '/generate/stop');
+}
+
 function request(method, endpoint, body) {
   return fetch(endpoint, {
     headers: {'Content-Type': 'application/json'},

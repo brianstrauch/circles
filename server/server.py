@@ -1,5 +1,6 @@
 import db
 import flask
+import threading
 
 app = flask.Flask(__name__)
 
@@ -18,20 +19,6 @@ CAR_SCHEMA = (
   'model',
   'capacity',
   'mpg'
-)
-
-CAR_AND_PERSON_SCHEMA = (
-  'id',
-  'model',
-  'capacity',
-  'mpg',
-
-  'id',
-  'firstName',
-  'lastName',
-  'team',
-  'gender',
-  'locationId'
 )
 
 @app.route('/peoplewithcars', methods=['GET'])
@@ -99,6 +86,36 @@ def delete_person():
 def delete_car():
   id = int(flask.request.args.get('id'))
   db.delete('car', id)
+  return flask.jsonify({})
+
+import time
+def generate():
+  global thread_running
+  while thread_running:
+    time.sleep(1)
+
+thread = None
+thread_running = False
+
+@app.route('/generate/start', methods=['POST'])
+def start():
+  global thread_running
+  thread_running = True
+  global thread
+  thread = threading.Thread(target=generate)
+  thread.start()
+  return flask.jsonify({})
+
+@app.route('/generate/assignments', methods=['GET'])
+def get_assignments():
+  return flask.jsonify({})
+
+@app.route('/generate/stop', methods=['POST'])
+def stop():
+  global thread_running
+  thread_running = False
+  global thread
+  thread.join()
   return flask.jsonify({})
 
 def sql_to_json(schema, tuple):
