@@ -26,10 +26,11 @@ def get_people_with_cars():
   search = flask.request.args['search']
 
   people = []
-  cars_and_people = db.joined_filtered_get(
+  cars_and_people = db.joined_filtered_sorted_get(
     'car', 'id',
     'person', 'carId',
-    'firstName', search
+    'firstName', search,
+    'firstName'
   )
 
   for car_and_person in cars_and_people:

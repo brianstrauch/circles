@@ -135,12 +135,12 @@ export default class People extends React.Component {
           {firstName} {lastName} {carId && '🚗'}
           <Button
             className="right-button"
-            variant="warning"
-            onClick={() => this.setState({showPersonModal: true, isEditing: true, person: person})}>Edit</Button>
-          <Button
-            className="right-button"
             variant="danger"
             onClick={() => this.onDeletePerson(id)}>Delete</Button>
+          <Button
+            className="right-button"
+            variant="warning"
+            onClick={() => this.setState({showPersonModal: true, isEditing: true, person: person})}>Edit</Button>
         </div>
       );
 
