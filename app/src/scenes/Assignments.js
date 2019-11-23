@@ -3,7 +3,7 @@ import React from 'react';
 import Button from 'react-bootstrap/Button';
 import Card from 'react-bootstrap/Card';
 
-import { get_assignments, start_generate, stop_generate } from '../api';
+import { getAssignments, startGenerate, stopGenerate } from '../api';
 
 import './Assignments.css';
 
@@ -23,18 +23,18 @@ export default class Assignments extends React.Component {
     if (this.state.isGenerating) {
       this.setState({isGenerating: false});
       clearInterval(this.state.loop);
-      stop_generate();
+      stopGenerate();
     } else {
       this.setState({isGenerating: true});
-      start_generate().then(() => {
-        let loop = setInterval(get_assignments, 5 * 1000);
+      startGenerate().then(() => {
+        let loop = setInterval(getAssignments, 5 * 1000);
         this.setState({loop: loop});
       });
     }
   }
 
   render() {
-    let people = this.props.selectedPeople.map(person => (
+    let people = this.props.people.map(person => (
       <p key={person.id}>{person.firstName} {person.lastName}</p>
     ));
 

@@ -1,6 +1,5 @@
 import React from 'react';
 
-import Card from 'react-bootstrap/Card';
 import Col from 'react-bootstrap/Col';
 import Container from 'react-bootstrap/Container';
 import Navbar from 'react-bootstrap/Navbar';
@@ -17,20 +16,17 @@ export default class Home extends React.Component {
     super(props);
 
     this.state = {
-      selectedPeople: []
+      people: []
     };
 
-    this.handleSelect = this.handleSelect.bind(this);
+    this.handleAdd = this.handleAdd.bind(this);
   }
 
-  handleSelect(person, selected) {
-    let people = this.state.selectedPeople;
-    if (selected) {
-      people.push(person);
-    } else {
-      // Remove
+  handleAdd(person) {
+    let people = this.state.people;
+    if (people.indexOf(person) < 0) {
+      this.setState({people: [...people, person]});
     }
-    this.setState({selectedPeople: people});
   }
 
   render() {
@@ -43,7 +39,7 @@ export default class Home extends React.Component {
         <Container>
           <Row>
             <Col>
-              <People onSelect={this.handleSelect} />
+              <People onAdd={this.handleAdd} />
             </Col>
             <Col>
               <Map />
@@ -51,7 +47,7 @@ export default class Home extends React.Component {
           </Row>
           <Row>
             <Col>
-              <Assignments selectedPeople={this.state.selectedPeople} />
+              <Assignments people={this.state.people} />
             </Col>
           </Row>
         </Container>

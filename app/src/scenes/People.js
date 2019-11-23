@@ -9,7 +9,7 @@ import Modal from 'react-bootstrap/Modal';
 import {
   deleteCar,
   deletePerson,
-  getPeopleWithCars,
+  getPeople,
   insertCar,
   insertPerson,
   updateCar,
@@ -25,13 +25,9 @@ export default class People extends React.Component {
     this.state = {
       search: '',
       people: [],
+      onAdd: props.onAdd,
 
-      onSelect: props.onSelect,
-      selectedPeople: [],
-
-      showPersonModal: false,
-      showCarModal: false,
-
+      showModal: false,
       person: {},
       isEditing: false
     };
@@ -39,10 +35,8 @@ export default class People extends React.Component {
     this.onSearch = this.onSearch.bind(this);
     this.refresh = this.refresh.bind(this);
 
-    this.submitPerson = this.submitPerson.bind(this);
+    this.submit = this.submit.bind(this);
     this.onDeletePerson = this.onDeletePerson.bind(this);
-
-    this.submitCar = this.submitCar.bind(this);
     this.onDeleteCar = this.onDeleteCar.bind(this);
   }
 
@@ -56,8 +50,8 @@ export default class People extends React.Component {
     });
   }
 
-  submitPerson(event) {
-    this.setState({showPersonModal: false});
+  submit(event) {
+    this.setState({showModal: false});
 
     event.persist();
     event.preventDefault();
@@ -69,39 +63,44 @@ export default class People extends React.Component {
       gender: event.target[3].value
     };
 
-    if (this.state.isEditing) {
-      person.id = this.state.person.id;
-      updatePerson(person).then(person => {
-        this.refresh();
-      });
-    } else {
-      insertPerson(person).then(person => {
-        this.refresh();
-      });
-    }
-  }
-
-  submitCar(event) {
-    this.setState({showCarModal: false});
-
-    event.persist();
-    event.preventDefault();
-
     let car = {
-      model: event.target[0].value,
-      capacity: event.target[1].value,
-      mpg: event.target[2].value
+      model: event.target[4].value,
+      capacity: parseInt(event.target[5].value),
+      mpg: parseInt(event.target[6].value)
     };
 
     if (this.state.isEditing) {
-      car.id = this.state.person.carId;
-      updateCar(car).then(car => {
-        this.refresh();
-      });
+      person.id = this.state.person.id;
+      if (car.model || car.capacity || car.mpg) {
+        if (person.car) {
+          car.id = person.car.id;
+          updateCar(car).then(car => {
+            updatePerson(person).then(person => {
+              this.refresh();
+            });
+          });
+        } else {
+          insertCar(car).then(car => {
+            person.carId = car.id;
+            updatePerson(person).then(person => {
+              this.refresh();
+            });
+          });
+        }
+      }
     } else {
-      insertCar(car).then(car => {
-        this.refresh();
-      });
+      if (car.model || car.capacity || car.mpg) {
+        insertCar(car).then(car => {
+          person.carId = car.id;
+          insertPerson(person).then(person => {
+            this.refresh();
+          });
+        });
+      } else {
+        insertPerson(person).then(person => {
+          this.refresh();
+        });
+      }
     }
   }
 
@@ -118,57 +117,51 @@ export default class People extends React.Component {
   }
 
   refresh() {
-    getPeopleWithCars(this.state.search).then(people => {
+    getPeople(this.state.search).then(people => {
       this.setState({people: people});
     });
   }
 
   render() {
-    let peopleWithCars = this.state.people.map(person => {
-      let { car, carId, id, firstName, lastName } = person;
-
-      person = (
-        <div className="person">
-          <Button
-            className="left-button"
-            onClick={() => this.state.onSelect(person)}>Add</Button>
-          {firstName} {lastName} {carId && '🚗'}
-          <Button
-            className="right-button"
-            variant="danger"
-            onClick={() => this.onDeletePerson(id)}>Delete</Button>
-          <Button
-            className="right-button"
-            variant="warning"
-            onClick={() => this.setState({showPersonModal: true, isEditing: true, person: person})}>Edit</Button>
-        </div>
-      );
+    let people = this.state.people.map(person => {
+      let { carId, id, firstName, lastName } = person;
 
       return (
         <ListGroup.Item key={id}>
-          {person}
+          <div className="person">
+            <Button
+              className="left-button"
+              onClick={() => this.state.onAdd(person)}>Add</Button>
+            {firstName} {lastName} {carId && '🚗'}
+            <Button
+              className="right-button"
+              variant="danger"
+              onClick={() => this.onDeletePerson(id)}>Delete</Button>
+            <Button
+              className="right-button"
+              variant="warning"
+              onClick={() => this.setState({showModal: true, isEditing: true, person: person})}>Edit</Button>
+          </div>
         </ListGroup.Item>
       );
     });
 
-    let command, person, car;
+    let command, person;
     if (this.state.isEditing) {
       command = 'Edit';
       person = this.state.person;
-      car = this.state.person.car;
     } else {
       command = 'Add';
-      person = {firstName: '', lastName: '', team: '', gender: ''};
-      car = {model: '', capacity: '', mpg: ''};
+      person = {firstName: '', lastName: '', team: '', gender: '', car: {}};
     }
 
-    let personModal = (
-      <Modal show={this.state.showPersonModal} onHide={() => this.setState({showPersonModal: false})}>
+    let modal = (
+      <Modal show={this.state.showModal} onHide={() => this.setState({showModal: false})}>
         <Modal.Header closeButton>
           <Modal.Title>{command} Person</Modal.Title>
         </Modal.Header>
 
-        <Form onSubmit={this.submitPerson}>
+        <Form onSubmit={this.submit}>
           <Modal.Body>
             <Form.Group>
               <Form.Label>First Name</Form.Label>
@@ -189,37 +182,23 @@ export default class People extends React.Component {
               <Form.Label>Gender</Form.Label>
               <Form.Control placeholder="M" defaultValue={person.gender} />
             </Form.Group>
-          </Modal.Body>
 
-          <Modal.Footer>
-            <Button type="submit">{command}</Button>
-          </Modal.Footer>
-        </Form>
-      </Modal>
-    );
+            <div className="car">
+              <Form.Group>
+                <Form.Label>Model</Form.Label>
+                <Form.Control placeholder="Tesla" defaultValue={person.car.model} />
+              </Form.Group>
 
-    let carModal = (
-      <Modal show={this.state.showCarModal} onHide={() => this.setState({showCarModal: false})}>
-        <Modal.Header closeButton>
-          <Modal.Title>{command} Car</Modal.Title>
-        </Modal.Header>
+              <Form.Group>
+                <Form.Label>Capacity</Form.Label>
+                <Form.Control placeholder="5" defaultValue={person.car.capacity} />
+              </Form.Group>
 
-        <Form onSubmit={this.submitCar}>
-          <Modal.Body>
-            <Form.Group>
-              <Form.Label>Model</Form.Label>
-              <Form.Control placeholder="Tesla" defaultValue={car.model} />
-            </Form.Group>
-
-            <Form.Group>
-              <Form.Label>Capacity</Form.Label>
-              <Form.Control placeholder="5" defaultValue={car.capacity} />
-            </Form.Group>
-
-            <Form.Group>
-              <Form.Label>MPG</Form.Label>
-              <Form.Control placeholder="Infinity" defaultValue={car.mpg} />
-            </Form.Group>
+              <Form.Group>
+                <Form.Label>MPG</Form.Label>
+                <Form.Control placeholder="Infinity" defaultValue={person.car.mpg} />
+              </Form.Group>
+            </div>
           </Modal.Body>
 
           <Modal.Footer>
@@ -234,16 +213,15 @@ export default class People extends React.Component {
         <Card.Body>
           <Card.Title id="title">
             <p>People</p>
-            <Button onClick={() => this.setState({showPersonModal: true, isEditing: false})}>New</Button>
+            <Button onClick={() => this.setState({showModal: true, isEditing: false})}>New</Button>
             <input id="search" className="form-control" placeholder="Search" onChange={this.onSearch} value={this.state.search} />
           </Card.Title>
 
           <ListGroup id="people-list" className="list-group">
-            {peopleWithCars}
+            {people}
           </ListGroup>
 
-          {personModal}
-          {carModal}
+          {modal}
         </Card.Body>
       </Card>
     );

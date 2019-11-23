@@ -4,7 +4,6 @@ import { StaticGoogleMap, Marker } from 'react-static-google-map';
 
 export default class GoogleMap extends React.Component {
   render() {
-    console.log(process.env.REACT_APP_KEY);
     return (
       <Card id="map" className="shadow-sm">
         <Card.Body>

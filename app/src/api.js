@@ -1,13 +1,5 @@
-export function getPeople() {
-  return request('GET', '/people');
-}
-
-export function getCars() {
-  return request('GET', '/cars');
-}
-
-export function getPeopleWithCars(search) {
-  return request('GET', `/peoplewithcars?search=${search}`);
+export function getPeople(search) {
+  return request('GET', `/people?search=${search}`);
 }
 
 export function insertCar(car) {
@@ -34,15 +26,15 @@ export function deletePerson(id) {
   return request('DELETE', `/person?id=${id}`);
 }
 
-export function start_generate() {
+export function startGenerate() {
   return request('POST', '/generate/start');
 }
 
-export function get_assignments() {
+export function getAssignments() {
   return request('GET', '/generate/assignments');
 }
 
-export function stop_generate() {
+export function stopGenerate() {
   return request('POST', '/generate/stop');
 }
 

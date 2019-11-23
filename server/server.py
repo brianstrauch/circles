@@ -21,8 +21,8 @@ CAR_SCHEMA = (
   'mpg'
 )
 
-@app.route('/peoplewithcars', methods=['GET'])
-def get_people_with_cars():
+@app.route('/people', methods=['GET'])
+def get_people():
   search = flask.request.args['search']
 
   people = []
@@ -40,18 +40,6 @@ def get_people_with_cars():
     people.append(person)
 
   return flask.jsonify(people)
-
-@app.route('/people', methods=['GET'])
-def get_people():
-  people = db.get('people')
-  people = [sql_to_json(PERSON_SCHEMA, person) for person in people]
-  return flask.jsonify(people)
-
-@app.route('/cars', methods=['GET'])
-def get_cars():
-  cars = db.get('car')
-  cars = [sql_to_json(CAR_SCHEMA, car) for car in cars]
-  return flask.jsonify(cars)
 
 @app.route('/person', methods=['POST'])
 def insert_person():
