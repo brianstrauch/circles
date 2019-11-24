@@ -26,8 +26,8 @@ export function deletePerson(id) {
   return request('DELETE', `/person?id=${id}`);
 }
 
-export function startGenerate() {
-  return request('POST', '/generate/start');
+export function startGenerate(people) {
+  return request('POST', '/generate/start', people);
 }
 
 export function getAssignments() {

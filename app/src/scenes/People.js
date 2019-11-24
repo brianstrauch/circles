@@ -25,7 +25,6 @@ export default class People extends React.Component {
     this.state = {
       search: '',
       people: [],
-      onAdd: props.onAdd,
 
       showModal: false,
       person: {},
@@ -131,7 +130,7 @@ export default class People extends React.Component {
           <div className="person">
             <Button
               className="left-button"
-              onClick={() => this.state.onAdd(person)}>Add</Button>
+              onClick={() => this.props.onAdd(person)}>Add</Button>
             {firstName} {lastName} {carId && '🚗'}
             <Button
               className="right-button"

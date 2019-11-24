@@ -10,10 +10,6 @@ def get(table):
   query = f'SELECT * FROM {table}'
   return execute_read(query)
 
-def joined_filtered_sorted_get(table_a, key_a, table_b, key_b, search_key, search_val, sort_val):
-  query = f'SELECT * FROM {table_a} a RIGHT JOIN {table_b} b ON a.{key_a} = b.{key_b} WHERE {search_key} LIKE \'{search_val}%\' ORDER BY {sort_val}'
-  return execute_read(query)
-
 def insert(table, obj):
   keys, vals = json_to_sql(obj)
   query = f'INSERT INTO {table} {keys} VALUES {vals}'

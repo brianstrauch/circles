@@ -13,29 +13,51 @@ export default class Assignments extends React.Component {
 
     this.state = {
       isGenerating: false,
-      loop: undefined
+      loop: undefined,
+
+      debug: '',
+      assignments: []
     };
 
     this.toggle = this.toggle.bind(this);
+    this.refreshAssignments = this.refreshAssignments.bind(this);
   }
 
   toggle() {
     if (this.state.isGenerating) {
-      this.setState({isGenerating: false});
+      this.setState({
+        isGenerating: false,
+        debug: 'Done!'
+      });
       clearInterval(this.state.loop);
       stopGenerate();
     } else {
-      this.setState({isGenerating: true});
-      startGenerate().then(() => {
-        let loop = setInterval(getAssignments, 5 * 1000);
+      this.setState({
+        isGenerating: true,
+        debug: 'Generating...'
+      });
+      startGenerate(this.props.people).then(() => {
+        let loop = setInterval(this.refreshAssignments, 5 * 1000);
         this.setState({loop: loop});
       });
     }
   }
 
+  refreshAssignments() {
+    getAssignments().then(assignments => {
+      console.log(assignments);
+      this.setState({assignments: assignments});
+    });
+  }
+
   render() {
-    let people = this.props.people.map(person => (
-      <p key={person.id}>{person.firstName} {person.lastName}</p>
+    let assignments = this.state.assignments.map(assignment => (
+      <div key={assignment.driver.id}>
+        <p>{assignment.driver.firstName} {assignment.driver.lastName}</p>
+        <ul>
+          {assignment.passengers.map(passenger => <li key={passenger.id}>{passenger.firstName} {passenger.lastName}</li>)}
+        </ul>
+      </div>
     ));
 
     return (
@@ -48,7 +70,9 @@ export default class Assignments extends React.Component {
             </Button>
           </Card.Title>
 
-          {people}
+          <p>People: {this.props.people.map(person => `${person.firstName} ${person.lastName}`).join(', ')}</p>
+          <p>{this.state.debug}</p>
+          {assignments}
         </Card.Body>
       </Card>
     );
