@@ -45,18 +45,16 @@ export default class Assignments extends React.Component {
 
   refreshAssignments() {
     getAssignments().then(assignments => {
-      console.log(assignments);
       this.setState({assignments: assignments});
+      this.props.onUpdate(assignments);
     });
   }
 
   render() {
     let assignments = this.state.assignments.map(assignment => (
       <div key={assignment.driver.id}>
-        <p>{assignment.driver.firstName} {assignment.driver.lastName}</p>
-        <ul>
-          {assignment.passengers.map(passenger => <li key={passenger.id}>{passenger.firstName} {passenger.lastName}</li>)}
-        </ul>
+        <span>{assignment.driver.firstName} {assignment.driver.lastName}: </span>
+        <span>{assignment.passengers.map(passenger => `${passenger.firstName} ${passenger.lastName}`).join(', ')}</span>
       </div>
     ));
 
@@ -70,7 +68,6 @@ export default class Assignments extends React.Component {
             </Button>
           </Card.Title>
 
-          <p>People: {this.props.people.map(person => `${person.firstName} ${person.lastName}`).join(', ')}</p>
           <p>{this.state.debug}</p>
           {assignments}
         </Card.Body>

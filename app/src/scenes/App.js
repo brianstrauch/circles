@@ -16,10 +16,12 @@ export default class Home extends React.Component {
     super(props);
 
     this.state = {
-      people: []
+      people: [],
+      assignments: []
     };
 
     this.handleAdd = this.handleAdd.bind(this);
+    this.handleUpdate = this.handleUpdate.bind(this);
   }
 
   handleAdd(person) {
@@ -27,6 +29,10 @@ export default class Home extends React.Component {
     if (people.indexOf(person) < 0) {
       this.setState({people: [...people, person]});
     }
+  }
+
+  handleUpdate(assignments) {
+    this.setState({assignments: assignments});
   }
 
   render() {
@@ -42,12 +48,12 @@ export default class Home extends React.Component {
               <People onAdd={this.handleAdd} />
             </Col>
             <Col>
-              <Map />
+              <Map people={this.state.people} assignments={this.state.assignments} />
             </Col>
           </Row>
           <Row>
             <Col>
-              <Assignments people={this.state.people} />
+              <Assignments people={this.state.people} onUpdate={this.handleUpdate} />
             </Col>
           </Row>
         </Container>
