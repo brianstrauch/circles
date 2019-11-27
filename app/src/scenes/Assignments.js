@@ -15,8 +15,8 @@ export default class Assignments extends React.Component {
       isGenerating: false,
       loop: undefined,
 
-      debug: '',
-      assignments: []
+      assignments: [],
+      debug: ''
     };
 
     this.toggle = this.toggle.bind(this);
@@ -26,15 +26,13 @@ export default class Assignments extends React.Component {
   toggle() {
     if (this.state.isGenerating) {
       this.setState({
-        isGenerating: false,
-        debug: 'Done!'
+        isGenerating: false
       });
       clearInterval(this.state.loop);
       stopGenerate();
     } else {
       this.setState({
         isGenerating: true,
-        debug: 'Generating...'
       });
       startGenerate(this.props.people).then(() => {
         let loop = setInterval(this.refreshAssignments, 5 * 1000);
@@ -44,9 +42,12 @@ export default class Assignments extends React.Component {
   }
 
   refreshAssignments() {
-    getAssignments().then(assignments => {
-      this.setState({assignments: assignments});
-      this.props.onUpdate(assignments);
+    getAssignments().then(res => {
+      this.setState({
+        assignments: res.assignments,
+        debug: res.debug
+      });
+      this.props.onUpdate(res.assignments);
     });
   }
 

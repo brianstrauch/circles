@@ -110,7 +110,6 @@ def start():
 @app.route('/generate/assignments', methods=['GET'])
 def get_assignments():
   global carpool
-
   assignments = carpool.serialize()
   return flask.jsonify(assignments)
 
@@ -129,10 +128,6 @@ def generate(people):
   passengers = []
 
   for person in people:
-    print('Loading', person)
-    if person['locationId'] == None:
-      continue
-
     person = Person(person)
     if person.is_driver:
       drivers.append(person)
@@ -169,16 +164,21 @@ class Carpool:
   def __init__(self, drivers, passengers):
     self.drivers = drivers
     self.passengers = passengers
+
     self.assignments = {}
+    self.debug = 'Generating...'
 
   def serialize(self):
-    return [
-      {
-        'driver': driver.json,
-        'passengers': [passenger.json for passenger in passengers]
-      }
-      for driver, passengers in self.assignments.items()
-    ]
+    return {
+      'assignments': [
+        {
+          'driver': driver.json,
+          'passengers': [passenger.json for passenger in passengers]
+        }
+        for driver, passengers in self.assignments.items()
+      ],
+      'debug': self.debug
+    }
 
   '''
   Random-restart hill climbing algorithm
@@ -191,12 +191,18 @@ class Carpool:
 
     self.remove_inefficient_cars()
 
-    # Special case: one driver
+    # Special case: 0 drivers
+    if len(self.drivers) == 0:
+      self.debug = 'Impossible.'
+      return
+
+    # Special case: 1 driver
     if len(self.drivers) == 1:
       driver = self.drivers[0]
       curr_assignments, _ = self.make_random_assignments()
       order, _ = self.optimize_order(driver, curr_assignments[driver])
       self.assignments = {driver: order}
+      self.debug = 'Done.'
       return
 
     RESETS, THRESHOLD = 20, 1000
@@ -248,11 +254,16 @@ class Carpool:
         best_score = curr_score
       
   '''
-  Make the drivers with the least efficient car passengers.
+  Turn the drivers with the least efficient cars into passengers.
   '''
   def remove_inefficient_cars(self):
     needed_capacity = len(self.drivers) + len(self.passengers)
     total_capacity = sum(driver.car.capacity for driver in self.drivers)
+
+    if needed_capacity > total_capacity:
+      self.passengers.extend(self.drivers)
+      self.drivers = []
+      return
 
     for driver in sorted(self.drivers, key=lambda x: x.car.efficiency()):
       remaining_capacity = total_capacity - driver.car.capacity
