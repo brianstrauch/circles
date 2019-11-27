@@ -38,6 +38,14 @@ export function stopGenerate() {
   return request('POST', '/generate/stop');
 }
 
+export function loadState(title) {
+  return request('GET', `/state?title=${title}`);
+}
+
+export function saveState(state) {
+  return request('POST', '/state', state);
+}
+
 function request(method, endpoint, body) {
   return fetch(endpoint, {
     headers: {'Content-Type': 'application/json'},

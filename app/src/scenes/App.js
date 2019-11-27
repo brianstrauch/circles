@@ -1,5 +1,6 @@
 import React from 'react';
 
+import Button from 'react-bootstrap/Button';
 import Col from 'react-bootstrap/Col';
 import Container from 'react-bootstrap/Container';
 import Navbar from 'react-bootstrap/Navbar';
@@ -8,6 +9,7 @@ import Row from 'react-bootstrap/Row';
 import Assignments from './Assignments';
 import Map from './Map';
 import People from './People';
+import { loadState, saveState } from '../api';
 
 import './App.css';
 
@@ -16,12 +18,16 @@ export default class Home extends React.Component {
     super(props);
 
     this.state = {
+      title: 'Example',
       people: [],
       assignments: []
     };
 
     this.handleAdd = this.handleAdd.bind(this);
     this.handleUpdate = this.handleUpdate.bind(this);
+
+    this.handleSave = this.handleSave.bind(this);
+    this.handleLoad = this.handleLoad.bind(this);
   }
 
   handleAdd(person) {
@@ -35,11 +41,25 @@ export default class Home extends React.Component {
     this.setState({assignments: assignments});
   }
 
+  handleSave() {
+    saveState(this.state);
+  }
+
+  handleLoad() {
+    let title = 'Example';
+    loadState(title).then(state => {
+      this.setState(state);
+    });
+  }
+
   render() {
     return (
       <div id="home" className="bg-light">
         <Navbar bg="dark" variant="dark">
           <Navbar.Brand>Circles</Navbar.Brand>
+
+          <Button onClick={this.handleSave}>Save</Button>
+          <Button onClick={this.handleLoad}>Load</Button>
         </Navbar>
 
         <Container>

@@ -1,4 +1,5 @@
-import db
+import db.mongo
+import db.mysql
 import flask
 import itertools
 import random
@@ -43,7 +44,7 @@ def get_people():
     'WHERE firstName LIKE "' + search + '%" '
     'ORDER BY firstName, lastName'
   )
-  people_locations_cars = db.execute_read(query)
+  people_locations_cars = db.mysql.execute_read(query)
 
   people = []
   for person_location_car in people_locations_cars:
@@ -60,37 +61,37 @@ def sql_to_json(schema, tuple):
 @app.route('/person', methods=['POST'])
 def insert_person():
   person = flask.request.get_json()
-  person['id'] = db.insert('person', person)
+  person['id'] = db.mysql.insert('person', person)
   return flask.jsonify(person)
 
 @app.route('/car', methods=['POST'])
 def insert_car():
   car = flask.request.get_json()
-  car['id'] = db.insert('car', car)
+  car['id'] = db.mysql.insert('car', car)
   return flask.jsonify(car)
   
 @app.route('/person', methods=['PUT'])
 def update_person():
   person = flask.request.get_json()
-  db.update('person', person)
+  db.mysql.update('person', person)
   return flask.jsonify(person)
 
 @app.route('/car', methods=['PUT'])
 def update_car():
   car = flask.request.get_json()
-  db.update('car', car)
+  db.mysql.update('car', car)
   return flask.jsonify(car)
 
 @app.route('/person', methods=['DELETE'])
 def delete_person():
   id = int(flask.request.args.get('id'))
-  db.delete('person', id)
+  db.mysql.delete('person', id)
   return flask.jsonify({})
 
 @app.route('/car', methods=['DELETE'])
 def delete_car():
   id = int(flask.request.args.get('id'))
-  db.delete('car', id)
+  db.mysql.delete('car', id)
   return flask.jsonify({})
 
 thread_running = False
@@ -328,6 +329,18 @@ Manhattan distance between two points
 '''
 def cost(a, b):
   return abs(a.latitude - b.latitude) + abs(a.longitude - b.longitude)
+
+@app.route('/state', methods=['GET'])
+def load_state():
+  title = flask.request.args.get('title')
+  state = db.mongo.get('state', {'title': title})
+  return flask.jsonify(state)
+
+@app.route('/state', methods=['POST'])
+def save_state():
+  state = flask.request.get_json()
+  db.mongo.insert('state', state)
+  return flask.jsonify(state)
 
 if __name__ == '__main__':
   app.run(debug=True)
