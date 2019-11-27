@@ -3,6 +3,8 @@ import React from 'react';
 import Button from 'react-bootstrap/Button';
 import Col from 'react-bootstrap/Col';
 import Container from 'react-bootstrap/Container';
+import Form from 'react-bootstrap/Form';
+import Modal from 'react-bootstrap/Modal';
 import Navbar from 'react-bootstrap/Navbar';
 import Row from 'react-bootstrap/Row';
 
@@ -18,6 +20,9 @@ export default class Home extends React.Component {
     super(props);
 
     this.state = {
+      isSaving: false,
+      isLoading: false,
+
       title: 'Example',
       people: [],
       assignments: []
@@ -41,25 +46,74 @@ export default class Home extends React.Component {
     this.setState({assignments: assignments});
   }
 
-  handleSave() {
-    saveState(this.state);
+  handleSave(event) {
+    event.persist();
+    event.preventDefault();
+
+    let title = event.target[0].value;
+    this.setState({title: title}, () => saveState(this.state));
   }
 
-  handleLoad() {
-    let title = 'Example';
+  handleLoad(event) {
+    event.persist();
+    event.preventDefault();
+
+    let title = event.target[0].value;
     loadState(title).then(state => {
       this.setState(state);
     });
   }
 
   render() {
+    let saveModal = (
+      <Modal show={this.state.isSaving} onHide={() => this.setState({isSaving: false})}>
+        <Modal.Header closeButton>
+          <Modal.Title>Save</Modal.Title>
+        </Modal.Header>
+
+        <Form onSubmit={this.handleSave}>
+          <Modal.Body>
+            <Form.Group>
+              <Form.Label>Title</Form.Label>
+              <Form.Control placeholder="Varsity Men" />
+            </Form.Group>
+          </Modal.Body>
+
+          <Modal.Footer>
+            <Button type="submit">Save</Button>
+          </Modal.Footer>
+        </Form>
+      </Modal>
+    );
+
+    let loadModal = (
+      <Modal show={this.state.isLoading} onHide={() => this.setState({isLoading: false})}>
+        <Modal.Header closeButton>
+          <Modal.Title>Load</Modal.Title>
+        </Modal.Header>
+
+        <Form onSubmit={this.handleLoad}>
+          <Modal.Body>
+            <Form.Group>
+              <Form.Label>Title</Form.Label>
+              <Form.Control placeholder="Varsity Men" />
+            </Form.Group>
+          </Modal.Body>
+
+          <Modal.Footer>
+            <Button type="submit">Load</Button>
+          </Modal.Footer>
+        </Form>
+      </Modal>
+    );
+
     return (
       <div id="home" className="bg-light">
         <Navbar bg="dark" variant="dark">
           <Navbar.Brand>Circles</Navbar.Brand>
 
-          <Button onClick={this.handleSave}>Save</Button>
-          <Button onClick={this.handleLoad}>Load</Button>
+          <Button onClick={() => this.setState({isSaving: true})}>Save</Button>
+          <Button onClick={() => this.setState({isLoading: true})}>Load</Button>
         </Navbar>
 
         <Container>
@@ -77,6 +131,9 @@ export default class Home extends React.Component {
             </Col>
           </Row>
         </Container>
+
+        {saveModal}
+        {loadModal}
       </div>
     );
   }
