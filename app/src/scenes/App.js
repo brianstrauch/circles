@@ -47,6 +47,8 @@ export default class Home extends React.Component {
   }
 
   handleSave(event) {
+    this.setState({ isSaving: false });
+
     event.persist();
     event.preventDefault();
 
@@ -55,6 +57,8 @@ export default class Home extends React.Component {
   }
 
   handleLoad(event) {
+    this.setState({ isLoading: false });
+
     event.persist();
     event.preventDefault();
 
