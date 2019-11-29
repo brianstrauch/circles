@@ -15,8 +15,8 @@ export default class Assignments extends React.Component {
       isGenerating: false,
       loop: undefined,
 
-      assignments: [],
-      debug: ''
+      debug: '',
+      assignments: undefined
     };
 
     this.toggle = this.toggle.bind(this);
@@ -44,15 +44,16 @@ export default class Assignments extends React.Component {
   refreshAssignments() {
     getAssignments().then(res => {
       this.setState({
-        assignments: res.assignments,
-        debug: res.debug
+        debug: res.debug,
+        assignments: res.assignments
       });
       this.props.onUpdate(res.assignments);
     });
   }
 
   render() {
-    let assignments = this.state.assignments.map(assignment => (
+    let assignments = this.state.assignments || this.props.assignments;
+    assignments = assignments.map(assignment => (
       <div key={assignment.driver.id}>
         <span>{assignment.driver.firstName} {assignment.driver.lastName}: </span>
         <span>{assignment.passengers.map(passenger => `${passenger.firstName} ${passenger.lastName}`).join(', ')}</span>

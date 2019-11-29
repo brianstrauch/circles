@@ -126,12 +126,17 @@ export default class Home extends React.Component {
               <People onAdd={this.handleAdd} />
             </Col>
             <Col>
-              <Map people={this.state.people} assignments={this.state.assignments} />
+              <Map
+                people={this.state.people}
+                assignments={this.state.assignments} />
             </Col>
           </Row>
           <Row>
             <Col>
-              <Assignments people={this.state.people} onUpdate={this.handleUpdate} />
+              <Assignments
+                people={this.state.people}
+                assignments={this.state.assignments}
+                onUpdate={this.handleUpdate} />
             </Col>
           </Row>
         </Container>
