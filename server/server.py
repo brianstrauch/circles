@@ -35,13 +35,20 @@ CAR_SCHEMA = (
 
 @app.route('/people', methods=['GET'])
 def get_people():
+  teams = flask.request.args['team']
+  team_filter = ' OR '.join(map(lambda team: f'team = {repr(team)}', teams.split(',')))
+
+  genders = flask.request.args['gender']
+  gender_filter = ' OR '.join(map(lambda gender: f'gender = {repr(gender)}', genders.split(',')))
+
   search = flask.request.args['search']
+  search_filter = f'firstName LIKE "{search}%"'
 
   query = (
     'SELECT * FROM person '
     'LEFT JOIN location ON person.locationId = location.id '
     'LEFT JOIN car ON person.carId = car.id '
-    'WHERE firstName LIKE "' + search + '%" '
+    f'WHERE ({team_filter}) AND ({gender_filter}) AND ({search_filter})'
     'ORDER BY firstName, lastName'
   )
   people_locations_cars = db.mysql.execute_read(query)

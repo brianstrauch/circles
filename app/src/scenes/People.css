@@ -12,6 +12,14 @@
   margin-left: 4px;
 }
 
+#filters {
+  margin-bottom: 8px;
+}
+
+#filters .filter {
+  margin-left: 4px;
+}
+
 #people-list {
   max-height: 400px;
   overflow-y: scroll;

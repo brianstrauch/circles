@@ -24,6 +24,10 @@ export default class People extends React.Component {
 
     this.state = {
       search: '',
+      filters: {
+        team: ['Novice', 'Varsity'],
+        gender: ['M', 'F']
+      },
       people: [],
 
       showModal: false,
@@ -32,6 +36,8 @@ export default class People extends React.Component {
     };
 
     this.onSearch = this.onSearch.bind(this);
+    this.toggleFilter = this.toggleFilter.bind(this);
+
     this.refresh = this.refresh.bind(this);
 
     this.submit = this.submit.bind(this);
@@ -45,6 +51,21 @@ export default class People extends React.Component {
 
   onSearch(event) {
     this.setState({search: event.target.value}, () => {
+      this.refresh();
+    });
+  }
+
+  toggleFilter(category, tag) {
+    let { filters } = this.state;
+
+    let idx = filters[category].indexOf(tag);
+    if (idx >= 0) {
+      filters[category].splice(idx, 1);
+    } else {
+      filters[category].push(tag);
+    }
+
+    this.setState({filters: filters}, () => {
       this.refresh();
     });
   }
@@ -116,7 +137,7 @@ export default class People extends React.Component {
   }
 
   refresh() {
-    getPeople(this.state.search).then(people => {
+    getPeople(this.state.filters, this.state.search).then(people => {
       this.setState({people: people});
     });
   }
@@ -215,6 +236,29 @@ export default class People extends React.Component {
             <Button onClick={() => this.setState({showModal: true, isEditing: false})}>New</Button>
             <input id="search" className="form-control" placeholder="Search" onChange={this.onSearch} value={this.state.search} />
           </Card.Title>
+
+          <div id="filters">
+            <input
+              className="filter"
+              type="checkbox"
+              defaultChecked
+              onClick={() => this.toggleFilter('team', 'Novice')} /> Novice
+            <input
+              className="filter"
+              type="checkbox"
+              defaultChecked
+              onClick={() => this.toggleFilter('team', 'Varsity')} /> Varsity
+            <input
+              className="filter"
+              type="checkbox"
+              defaultChecked
+              onClick={() => this.toggleFilter('gender', 'M')} /> Men
+            <input
+              className="filter"
+              type="checkbox"
+              defaultChecked
+              onClick={() => this.toggleFilter('gender', 'F')} /> Women
+          </div>
 
           <ListGroup id="people-list" className="list-group">
             {people}

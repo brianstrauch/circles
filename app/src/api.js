@@ -1,5 +1,8 @@
-export function getPeople(search) {
-  return request('GET', `/people?search=${search}`);
+export function getPeople(filters, search) {
+  let params = filters;
+  params['search'] = search;
+  params = new URLSearchParams(params);
+  return request('GET', `/people?${params}`);
 }
 
 export function insertCar(car) {
